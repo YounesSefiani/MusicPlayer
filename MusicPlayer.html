@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MusicPlayer</title>
+    <link rel="stylesheet" href="MusicPlayer.css" />
+    <script
+      src="https://kit.fontawesome.com/4f0e414cfd.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="music-player">
+      <div class="music-player-playing">
+        <div id="music-player-playing-background"></div>
+        <div class="music-player-song">
+          <div id="music-player-left">
+            <audio id="audio" src=""></audio>
+            <img src="vinyl.png" alt="vinyle" id="vinyle" />
+
+            <div id="music-player-cover">
+              <i class="fa-solid fa-compact-disc"></i>
+            </div>
+          </div>
+          <div id="music-player-infos">
+            <h3 id="song-title">Title</h3>
+            <div class="line"></div>
+            <h3 id="song-artist">Artiste / Groupe</h3>
+            <h3 id="song-album">Album</h3>
+          </div>
+        </div>
+        <div id="music-player-controls">
+          <div id="music-player-controls-line">
+            <div class="player-repeat-random">
+              <button type="button" id="shuffleBtn" onclick="toggleShuffle()">
+                <i class="fa-solid fa-shuffle"></i>
+              </button>
+              <button type="button" id="repeatBtn" onclick="toggleRepeat()">
+                <i class="fa-solid fa-repeat"></i>
+              </button>
+            </div>
+            <div id="progress-container">
+              <div id="progress-bar"></div>
+            </div>
+            <div class="player-timer">
+              <p id="current-time">--:--</p>
+              <p id="duration">--:--</p>
+            </div>
+          </div>
+          <div id="music-player-controls-buttons">
+            <button type="button" id="prevBtn" onclick="previousSong()">
+              <i class="fa-solid fa-backward-step"></i>
+            </button>
+            <button type="button" id="playBtn" onClick="playing()">
+              <i class="fa-solid fa-play"></i>
+            </button>
+            <button type="button" id="stopBtn" onclick="stopSong()">
+              <i class="fa-solid fa-stop"></i>
+            </button>
+            <button type="button" id="nextBtn" onclick="nextSong()">
+              <i class="fa-solid fa-forward-step"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="music-player-playlist">
+        <h2>Playlist</h2>
+        <div id="music-player-playlist-list"></div>
+      </div>
+    </div>
+    <script src="MusicPlayer.js"></script>
+  </body>
+</html>
