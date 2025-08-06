@@ -1,4 +1,3 @@
-
 /**********BACKGROUND*DU*LECTEUR*DE*MUSIQUE*********/
 const colorSchemes = {
   blue: ["#001F3F", "#003366", "#004C99", "#0066CC", "#0080FF", "#3399FF"],
@@ -167,7 +166,7 @@ const trackList = [
     cover: "./cover/bz_album.jpg",
     src: "./songs/bz_nothing_to_change.mp3",
   },
-    {
+  {
     id: 6,
     title: "Zetsubou Billy",
     artist: "Maximum The Hormone",
@@ -175,7 +174,7 @@ const trackList = [
     genre: "J-Rock",
     cover: "./cover/maximum_the_hormone_buiikikaesu.jpg",
     src: "./songs/maximum_the_hormone_zetsubou_billy.mp3",
-  }
+  },
 ];
 
 const playlist = document.getElementById("music-player-playlist-list");
@@ -205,5 +204,282 @@ trackList.forEach((track) => {
   playlist.appendChild(playlistTrack);
 });
 
+/***********************************/
+
+/**********FONCTIONS**********/
+function loadAndPlayTrack() {
+  const track = trackList[currentTrackId];
+  songTitle.textContent = track.title;
+  songArtist.textContent = track.artist;
+  songAlbum.textContent = track.album;
+  audio.src = track.src;
+  audio.load();
+  audio.play();
+  rotateVinyle();
+
+  updateCoverImage();
+}
+
+function stopTrack() {
+  songTitle.textContent = "Title";
+  songArtist.textContent = "Artiste / Groupe";
+  songAlbum.textContent = "Album";
+  audio.src = "";
+  audio.load();
+  currentTrackId = 0;
+}
+
+function updateTrackInfo() {
+  const track = trackList[currentTrackId];
+  songTitle.textContent = track.title;
+  songArtist.textContent = track.artist;
+  songAlbum.textContent = track.album;
+}
+
+function updateCoverImage() {
+  const coverImage = document.getElementById("music-player-cover");
+  const currentTrack = trackList[currentTrackId];
+
+  coverImage.innerHTML = "";
+
+  if (currentTrack.cover) {
+    const img = document.createElement("img");
+    img.src = currentTrack.cover;
+    coverImage.appendChild(img);
+  } else {
+    coverImage.innerHTML = '<i class="fa-solid fa-compact-disc"></i>';
+  }
+}
+
+const timerElapsed = document.querySelector(".player-timer p:nth-child(1)");
+const timerTotal = document.querySelector(".player-timer p:nth-child(2)");
+
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${minutes.toString().padStart(2, "0")}:${secs
+    .toString()
+    .padStart(2, "0")}`;
+}
+
+audio.addEventListener("loadedmetadata", () => {
+  timerTotal.textContent = formatTime(audio.duration);
+});
+
+const progressBar = document.getElementById("progress-bar");
+const currentTimeEl = document.getElementById("current-time");
+const durationEl = document.getElementById("duration");
+
+audio.addEventListener("timeupdate", () => {
+  const current = audio.currentTime;
+  const total = audio.duration;
+
+  // Mise à jour de la barre
+  const percent = (current / total) * 100;
+  progressBar.style.width = `${percent}%`;
+
+  // Mise à jour des timers
+  currentTimeEl.textContent = formatTime(current);
+  durationEl.textContent = formatTime(total);
+});
+
+function formatTime(time) {
+  if (!time) return "--:--";
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60)
+    .toString()
+    .padStart(2, "0");
+  return `${minutes}:${seconds}`;
+}
+
+const progressContainer = document.getElementById("progress-container");
+
+progressContainer.addEventListener("click", (e) => {
+  const rect = progressContainer.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const width = rect.width;
+  const percent = clickX / width;
+
+  audio.currentTime = percent * audio.duration;
+});
+
+audio.addEventListener("loadedmetadata", updateTrackInfo);
+
+audio.addEventListener("ended", nextSong);
+
+const play = document.querySelector("#playBtn i");
+const vinyle = document.getElementById("vinyle");
+let rotation = 0;
+let animationFrameId = null;
+
+let isPlaying = false;
+let isShuffle = false;
+let isRepeat = false;
+let trackLoaded = false;
+
+function rotateVinyle() {
+  // Empêche plusieurs animations actives
+  if (animationFrameId) return;
+
+  function animate() {
+    rotation += 0.5; // Vitesse
+    if (rotation >= 360) rotation -= 360;
+
+    vinyle.style.transform = `rotate(${rotation}deg)`;
+
+    // Si on est encore en lecture, continue
+    if (isPlaying) {
+      animationFrameId = requestAnimationFrame(animate);
+    } else {
+      // Sinon, stoppe l'animation proprement
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+  }
+
+  // Lance l’animation
+  animationFrameId = requestAnimationFrame(animate);
+}
+function playing(newTrackId = currentTrackId) {
+  const playIcon = document.querySelector("#playBtn i");
+
+  if (newTrackId !== currentTrackId) {
+    currentTrackId = newTrackId;
+    trackLoaded = false;
+    isPlaying = false; // on force le rechargement de la nouvelle piste
+  }
+
+  if (!isPlaying) {
+    if (!trackLoaded) {
+      loadAndPlayTrack(); // Charge la piste uniquement la première fois
+      updateCoverImage();
+      trackLoaded = true;
+    }
+
+    audio.play();
+    isPlaying = true;
+
+    rotateVinyle();
+    playIcon.classList.replace("fa-play", "fa-pause");
+  } else {
+    audio.pause();
+    isPlaying = false;
+
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+    playIcon.classList.replace("fa-pause", "fa-play");
+  }
+}
+
+function stopSong() {
+  audio.pause();
+  audio.currentTime = 0;
+  isPlaying = false;
+  cancelAnimationFrame(animationFrameId);
+  animationFrameId = null;
+  progressBar.style.width = "0%";
+
+  const playIcon = document.querySelector("#playBtn i");
+  playIcon.classList.replace("fa-pause", "fa-play");
+  stopTrack();
+
+  const coverImage = document.getElementById("music-player-cover");
+  coverImage.innerHTML = '<i class="fa-solid fa-compact-disc"></i>';
+
+  const vinyle = document.getElementById("vinyle");
+  vinyle.style.transform = "rotate(0deg)";
+
+  trackLoaded = false;
+}
+
+function nextSong() {
+  if (isShuffle) {
+    let randomTrackId;
+    do {
+      randomTrackId = Math.floor(Math.random() * trackList.length);
+    } while (randomTrackId === currentTrackId && trackList.length > 1);
+
+    currentTrackId = randomTrackId;
+  } else {
+    currentTrackId = (currentTrackId + 1) % trackList.length; // revient à 0 si on est à la fin
+  }
+
+  if (isRepeat) {
+    repeatPlayer();
+    audio.play();
+    return;
+  }
+
+  if (isPlaying) {
+    loadAndPlayTrack();
+    audio.play();
+    updateCoverImage();
+  } else {
+    loadAndPlayTrack();
+    audio.pause();
+    updateCoverImage();
+  }
+}
+
+function previousSong() {
+  if (isShuffle) {
+    let randomTrackId;
+    do {
+      randomTrackId = Math.floor(Math.random() * trackList.length);
+    } while (randomTrackId === currentTrackId && trackList.length > 1);
+
+    currentTrackId = randomTrackId;
+  } else {
+    currentTrackId = (currentTrackId - 1 + trackList.length) % trackList.length;
+  }
+
+  if (isPlaying) {
+    loadAndPlayTrack();
+    audio.play();
+    updateCoverImage();
+  } else {
+    loadAndPlayTrack();
+    audio.pause();
+    updateCoverImage();
+  }
+}
+
+function shufflePlayer() {
+  if (!isShuffle) {
+    isShuffle = true;
+    currentTrackId = Math.floor(Math.random() * trackList.length);
+  }
+}
+
+const shuffleBtn = document.getElementById("shuffleBtn");
+function toggleShuffle() {
+  if (!isShuffle) {
+    isShuffle = true;
+    shufflePlayer();
+    shuffleBtn.classList.add("active");
+  } else {
+    isShuffle = false;
+    shuffleBtn.classList.remove("active");
+  }
+}
+
+function repeatPlayer() {
+  if (!isRepeat) {
+    isRepeat = true;
+    audio.currentTime = 0;
+    audio.play();
+  }
+}
+
+function toggleRepeat() {
+  if (!isRepeat) {
+    isRepeat = true;
+    repeatPlayer();
+    repeatBtn.classList.add("active");
+  } else {
+    isRepeat = false;
+    repeatBtn.classList.remove("active");
+  }
+}
 
 /***********************************/
