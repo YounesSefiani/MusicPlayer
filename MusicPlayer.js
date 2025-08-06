@@ -1,3 +1,5 @@
+
+/**********BACKGROUND*DU*LECTEUR*DE*MUSIQUE*********/
 const colorSchemes = {
   blue: ["#001F3F", "#003366", "#004C99", "#0066CC", "#0080FF", "#3399FF"],
   green: ["#004D1A", "#006622", "#008033", "#009933", "#00B33C", "#00CC44"],
@@ -109,3 +111,99 @@ window.addEventListener("resize", () => {
   initializeColumns();
 });
 
+/***********************************/
+
+/*********PLAYLIST**********/
+const audio = document.getElementById("audio");
+const songTitle = document.getElementById("song-title");
+const songArtist = document.getElementById("song-artist");
+const songAlbum = document.getElementById("song-album");
+const track = document.getElementById("music-player-playlist-track");
+let currentTrackId = 0;
+
+const trackList = [
+  {
+    id: 1,
+    title: "Change Your Life",
+    artist: "Anna Tsuchiya",
+    album: "Strip Me?",
+    genre: "J-Rock",
+    cover: "./cover/change_your_life.jpg",
+    src: "./songs/anna_tsuchiya_change_your_life.mp3",
+  },
+  {
+    id: 2,
+    title: "Anger's Remorse",
+    artist: "Old Gods of Asgard",
+    album: "Rebirth",
+    genre: "Heavy Metal",
+    cover: "./cover/old_gods_of_asgard_rebirth.jpg",
+    src: "./songs/old_gods_of_asgard_anger_remorse.mp3",
+  },
+  {
+    id: 3,
+    title: "War",
+    artist: "Poets of The Fall",
+    album: "Twilight Theater",
+    genre: "Rock",
+    cover: "./cover/poets_of_the_fall_twilight_theater.jpg",
+    src: "./songs/poets_of_the_fall_war.mp3",
+  },
+  {
+    id: 4,
+    title: "L'odeur de l'essence",
+    artist: "Orelsan",
+    album: "Civilisation",
+    genre: "Rap",
+    cover: "./cover/orelsan_civilisation.jpg",
+    src: "./songs/orelsan_lodeur_de_lessence.mp3",
+  },
+  {
+    id: 5,
+    title: "Nothing to Change",
+    artist: "B'Z",
+    album: "B'Z",
+    genre: "J-Rock",
+    cover: "./cover/bz_album.jpg",
+    src: "./songs/bz_nothing_to_change.mp3",
+  },
+    {
+    id: 6,
+    title: "Zetsubou Billy",
+    artist: "Maximum The Hormone",
+    album: "Bu-iikikaesu",
+    genre: "J-Rock",
+    cover: "./cover/maximum_the_hormone_buiikikaesu.jpg",
+    src: "./songs/maximum_the_hormone_zetsubou_billy.mp3",
+  }
+];
+
+const playlist = document.getElementById("music-player-playlist-list");
+trackList.forEach((track) => {
+  const playlistTrack = document.createElement("div");
+  playlistTrack.classList.add("music-player-playlist-track");
+  playlistTrack.innerHTML = `
+    <div id="music-track-cover">
+      <img src="${track.cover}" alt="jaquette"></i>
+    </div>
+    <div id="music-track-infos">
+      <div id="music-track-infos-top">
+        <p id="music-track-artist">${track.artist}</p>
+        <p id="music-track-title">${track.title}</p>
+      </div>
+      <div class="music-track-line"></div>
+      <div id="music-track-infos-bottom">
+        <p id="music-track-album">${track.album}</p>
+        <p id="music-track-genre">${track.genre}</p>
+      </div>
+    </div>
+      <button type="button" id="playTrack" onclick="playing(${track.id - 1})">
+        <i class="fa-solid fa-play"></i>
+      </button>
+    </div>
+  `;
+  playlist.appendChild(playlistTrack);
+});
+
+
+/***********************************/
